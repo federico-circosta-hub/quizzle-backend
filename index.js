@@ -6,7 +6,7 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 
-const allowedOrigins = ["http://localhost:3000", "https://uizzle.netlify.app/"];
+const allowedOrigins = ["http://localhost:3000", "https://uizzle.netlify.app"];
 
 app.use(
   cors({
