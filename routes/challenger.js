@@ -38,12 +38,14 @@ router.post("/create", authMiddleware, async (req, res) => {
     if (alreadyPresentChallenger)
       return res.status(409).json({ error: "Nome già in uso" });
 
-    const questionsForChallenger = admin.questions.map((questionId) => ({
-      questionId,
-      wasAnswered: false,
-      answer: null,
-      isCorrect: false,
-    }));
+    const questionsForChallenger = admin.questions
+      .filter((q) => q.isPublished)
+      .map((questionId) => ({
+        questionId,
+        wasAnswered: false,
+        answer: null,
+        isCorrect: false,
+      }));
 
     const challenger = new Challenger({
       name,

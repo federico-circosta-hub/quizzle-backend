@@ -51,6 +51,28 @@ router.post("/add-question", authMiddleware, async (req, res) => {
   }
 });
 
+router.post("/publish-question", authMiddleware, async (req, res) => {
+  const { questionId } = req.body;
+  const adminUsername = req.user.username;
+
+  try {
+    const admin = await Admin.findOne({ username: adminUsername });
+    if (!admin) return res.status(404).json({ error: "Admin non trovato" });
+
+    const question = admin.questions.id(questionId);
+    if (!question)
+      return res.status(404).json({ error: "Domanda non trovata" });
+
+    question.isPublished = true;
+    await admin.save();
+
+    res.status(200).json({ message: "Domanda pubblicata con successo" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Errore nella pubblicazione della domanda" });
+  }
+});
+
 router.post("/answer-question", async (req, res) => {
   const { challengerName, adminUsername, questionId, userAnswer } = req.body;
 
