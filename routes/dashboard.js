@@ -26,6 +26,8 @@ router.get("/", async (req, res) => {
         name: challenger.name,
         score: challenger.score,
         totalQuestions: challenger.questions.length,
+        notAnsweredQuestions: challenger.questions.filter((q) => !q.wasAnswered)
+          .length,
       }))
     );
   } catch (error) {

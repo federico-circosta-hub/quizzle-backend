@@ -32,15 +32,6 @@ router.post("/add-question", authMiddleware, async (req, res) => {
 
     if (!admin) return res.status(404).json({ error: "Admin non trovato" });
 
-    await Challenger.updateMany(
-      { adminUsername },
-      {
-        $push: {
-          questions: { questionId: newQuestion._id, wasAnswered: false },
-        },
-      }
-    );
-
     res.status(201).json({
       message: "Domanda aggiunta con successo",
       question: newQuestion,
@@ -57,14 +48,28 @@ router.post("/publish-question", authMiddleware, async (req, res) => {
 
   try {
     const admin = await Admin.findOne({ username: adminUsername });
+    console.log("admin", admin);
     if (!admin) return res.status(404).json({ error: "Admin non trovato" });
 
-    const question = admin.questions.id(questionId);
+    const question = await Question.findById(questionId);
     if (!question)
       return res.status(404).json({ error: "Domanda non trovata" });
 
     question.isPublished = true;
-    await admin.save();
+    await question.save();
+
+    await Challenger.updateMany(
+      { adminUsername },
+      {
+        $push: {
+          questions: {
+            questionId: question._id,
+            wasAnswered: false,
+            _id: question._id,
+          },
+        },
+      }
+    );
 
     res.status(200).json({ message: "Domanda pubblicata con successo" });
   } catch (error) {
@@ -151,6 +156,36 @@ router.get("/questions", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Errore nel recupero delle domande" });
+  }
+});
+
+router.delete("/delete/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedQuestion = await Question.findByIdAndDelete(id);
+    if (!deletedQuestion) {
+      return res.status(404).json({ error: "Domanda non trovata" });
+    }
+    console.log("deletedQuestion", deletedQuestion);
+    await Admin.updateMany(
+      { questions: deletedQuestion._id },
+      { $pull: { questions: deletedQuestion._id } }
+    );
+
+    await Challenger.updateMany(
+      { "questions.questionId": deletedQuestion._id },
+      { $pull: { questions: { questionId: deletedQuestion._id } } }
+    );
+
+    res
+      .status(200)
+      .json({ message: "Domanda eliminata e rimossa dai riferimenti" });
+  } catch (error) {
+    console.error("Errore nella cancellazione della domanda:", error);
+    res
+      .status(500)
+      .json({ error: "Errore durante l'eliminazione della domanda" });
   }
 });
 

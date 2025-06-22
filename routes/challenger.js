@@ -32,10 +32,11 @@ router.post("/create", authMiddleware, async (req, res) => {
   try {
     const admin = await Admin.findById(adminId);
     if (!admin) return res.status(404).json({ error: "Admin non trovato" });
-    const alreadyPresentChallenger = await Challenger.find({
+    const presentChallenger = await Challenger.find({
       name: name,
     });
-    if (alreadyPresentChallenger)
+
+    if (presentChallenger.length > 0)
       return res.status(409).json({ error: "Nome già in uso" });
 
     const questionsForChallenger = admin.questions
@@ -77,7 +78,7 @@ router.get("/by-name", async (req, res) => {
       "questions.questionId",
       "-correctOpt"
     );
-
+    console.log("challenger", challenger);
     if (!challenger) {
       return res.status(404).json({ error: "Challenger non trovato" });
     }
