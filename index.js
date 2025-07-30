@@ -6,9 +6,13 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 
-const allowedOrigins = ["http://localhost:3000", "https://uizzle.netlify.app"];
-app.use(cors());
-/* app.use(
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://uizzle.netlify.app",
+  "http://192.168.178.46:3000",
+];
+
+app.use(
   cors({
     origin: function (origin, callback) {
       console.log("origin", origin);
@@ -29,7 +33,7 @@ app.use((err, req, res, next) => {
       .json({ error: "Accesso non consentito da questa origine" });
   }
   next(err);
-}); */
+});
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
