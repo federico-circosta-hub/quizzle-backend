@@ -2,6 +2,7 @@ const express = require("express");
 const authMiddleware = require("../middleware/auth");
 const Admin = require("../model/Admin");
 const Challenger = require("../model/Challenger");
+const Question = require("../model/Question");
 
 const router = express.Router();
 
@@ -39,15 +40,18 @@ router.post("/create", authMiddleware, async (req, res) => {
     if (presentChallenger.length > 0)
       return res.status(409).json({ error: "Nome già in uso" });
 
-    const questionsForChallenger = admin.questions
-      .filter((q) => q.isPublished)
-      .map((questionId) => ({
-        questionId,
-        wasAnswered: false,
-        answer: null,
-        isCorrect: false,
-      }));
+    const publishedQuestions = await Question.find({
+      _id: { $in: admin.questions },
+      isPublished: true,
+    });
 
+    const questionsForChallenger = publishedQuestions.map((questionId) => ({
+      questionId,
+      wasAnswered: false,
+      answer: null,
+      isCorrect: null,
+    }));
+    console.log("questionsForChallenger", questionsForChallenger);
     const challenger = new Challenger({
       name,
       adminUsername: admin.username,

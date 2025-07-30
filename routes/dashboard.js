@@ -24,6 +24,7 @@ router.get("/", async (req, res) => {
     res.json(
       challengers.map((challenger) => ({
         name: challenger.name,
+        imgLink: challenger.imgLink,
         score: challenger.score,
         totalQuestions: challenger.questions.length,
         notAnsweredQuestions: challenger.questions.filter((q) => !q.wasAnswered)
