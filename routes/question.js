@@ -8,7 +8,7 @@ const { default: mongoose } = require("mongoose");
 const router = express.Router();
 
 router.post("/add-question", authMiddleware, async (req, res) => {
-  const { question, options, correctOpt } = req.body;
+  const { question, media, options, correctOpt } = req.body;
   const adminUsername = req.user.username; // dal JWT
 
   try {
