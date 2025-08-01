@@ -125,8 +125,6 @@ router.post("/answer-question", async (req, res) => {
     question.answer = userAnswer;
     question.isCorrect = isCorrect;
 
-    if (isCorrect) challenger.score += 1;
-
     await challenger.save();
     res
       .status(200)

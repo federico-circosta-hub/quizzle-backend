@@ -12,7 +12,6 @@ const ChallengerSchema = new mongoose.Schema({
       isCorrect: { type: Boolean },
     },
   ],
-  score: { type: Number, default: 0 },
 });
 
 module.exports = mongoose.model("Challenger", ChallengerSchema);

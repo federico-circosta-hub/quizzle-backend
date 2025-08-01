@@ -51,13 +51,12 @@ router.post("/create", authMiddleware, async (req, res) => {
       answer: null,
       isCorrect: null,
     }));
-    console.log("questionsForChallenger", questionsForChallenger);
+
     const challenger = new Challenger({
       name,
       adminUsername: admin.username,
       imgLink,
       questions: questionsForChallenger,
-      score: 0,
     });
 
     await challenger.save();
