@@ -18,6 +18,7 @@ router.post("/add-question", authMiddleware, async (req, res) => {
 
     const newQuestion = new Question({
       question,
+      media,
       options,
       correctOpt,
       adminUsername,
