@@ -81,12 +81,21 @@ router.get("/by-name", async (req, res) => {
       "questions.questionId",
       "-correctOpt"
     );
-    console.log("challenger", challenger);
     if (!challenger) {
       return res.status(404).json({ error: "Challenger non trovato" });
     }
 
-    res.status(200).json(challenger);
+    const score = challenger.questions.filter(
+      (q) => q.isCorrect && q.wasAnswered
+    ).length;
+    console.log("score", score);
+    const response = {
+      ...challenger.toObject(),
+      score,
+    };
+    console.log("response", response);
+
+    res.status(200).json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Errore nel recupero del Challenger" });
@@ -112,6 +121,23 @@ router.get("/challenger-exists", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Errore nel controllo del Challenger" });
+  }
+});
+
+router.delete("/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deleted = await Challenger.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Challenger non trovato" });
+    }
+
+    res.status(200).json({ message: "Challenger eliminato con successo" });
+  } catch (error) {
+    console.error("Errore nell'eliminazione del challenger:", error);
+    res.status(500).json({ error: "Errore del server" });
   }
 });
 
