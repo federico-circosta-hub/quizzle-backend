@@ -43,6 +43,33 @@ router.post("/add-question", authMiddleware, async (req, res) => {
   }
 });
 
+router.put("/edit/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params; // ID della domanda
+  const { question, media, options, correctOpt } = req.body;
+
+  try {
+    const updatedQuestion = await Question.findByIdAndUpdate(
+      id,
+      { question, media, options, correctOpt },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedQuestion) {
+      return res.status(404).json({ error: "Domanda non trovata" });
+    }
+
+    res
+      .status(200)
+      .json({
+        message: "Domanda aggiornata con successo",
+        question: updatedQuestion,
+      });
+  } catch (error) {
+    console.error("Errore nella modifica della domanda:", error);
+    res.status(500).json({ error: "Errore del server" });
+  }
+});
+
 router.post("/publish-question", authMiddleware, async (req, res) => {
   const { questionId } = req.body;
   const adminUsername = req.user.username;
