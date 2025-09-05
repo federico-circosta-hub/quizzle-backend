@@ -27,7 +27,14 @@ router.get("/", async (req, res) => {
       notAnsweredQuestions: challenger.questions.filter((q) => !q.wasAnswered)
         .length,
     }));
-    res.json(challengersResponse.sort((a, b) => b.score - a.score));
+    res.json(
+      challengersResponse.sort(
+        (a, b) =>
+          b.score - a.score ||
+          b.notAnsweredQuestions - a.notAnsweredQuestions ||
+          a.name.localeCompare(b.name)
+      )
+    );
   } catch (error) {
     res.status(500).json({ error: "Errore nel recupero della dashboard" });
   }
